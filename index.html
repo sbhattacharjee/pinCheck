@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script>
+    
+    $( document ).ready(function() {
+
+        $.ajax({
+             url: "http://127.0.0.1:3000/verifyPhone",
+             type: 'GET',
+             contentType: 'text/plain',
+             crossDomain: true,
+             dataType: 'text',
+            // processData: false,
+             data:  {"tele":"15104587920"},
+             success: function(result){
+                $("#passed").html("Message id ==>" +result);
+
+                verifyPin(result);
+
+            },
+            error: function(err){
+            
+                $("#failed").html("Failed..." +err);
+            },
+ 
+         }); 
+
+
+        /* Twilio SMS Message REST API call  */
+        /*
+        $.ajax({
+           //  url: "https://AC3fe9bfb8e7c1616336d7baa40d25fe69:85e0c36d88bffc4679f7148594e33106@api.twilio.com/2010-04-01/Accounts/AC3fe9bfb8e7c1616336d7baa40d25fe69/Messages.json",
+            url: "https://AC3fe9bfb8e7c1616336d7baa40d25fe69:85e0c36d88bffc4679f7148594e33106@api.twilio.com/2010-04-01/Accounts/AC3fe9bfb8e7c1616336d7baa40d25fe69/Messages.json",
+             type: 'POST',
+             contentType: 'application/json',
+            // crossDomain: true,
+             dataType: 'jsonp',
+            // processData: false,
+             data: '{"To":"+15104587920", "From":"+12014845012", "Body":"Your verification code is 002805"}',
+             success: function(result){
+                
+                $("#passed").html("Passed..."+JSON.stringify(result));
+            },
+            error: function(err){
+            
+                $("#failed").html("Failed..."+JSON.stringify(err));
+            }
+            /*,
+              beforeSend: function(xhr) { 
+                  xhr.setRequestHeader("AC3fe9bfb8e7c1616336d7baa40d25fe69", "85e0c36d88bffc4679f7148594e33106" ); 
+            } 
+         
+               */ 
+         
+         /*
+         });
+    
+        */
+
+
+    /*     $.ajax({
+             url: "https://api.twilio.com/2010-04-01/Accounts/AC3fe9bfb8e7c1616336d7baa40d25fe69/Messages.json",
+              headers: {
+                'AC3fe9bfb8e7c1616336d7baa40d25fe69': "85e0c36d88bffc4679f7148594e33106"
+              }
+                beforeSend: function(xhr) { 
+                  xhr.setRequestHeader("Authorization", "Basic " + btoa("username:password")); 
+                 },
+
+             type: 'POST',
+             dataType: 'json',
+             contentType: 'application/json',
+             processData: false,
+             data: '{"To":"5104587920", "From":"+12014845012", "Body":"Your verification code is 002805"}',
+             success: function (data) {
+              $("#status").html("Test successful"+ JSON.stringify(data));
+            },
+              error: function(data){
+               $("#status").html("Failed");
+             }
+    });
+
+    */
+
+    });
+
+
+    function verifyPin(messageId){
+         $.ajax({
+             url: "http://127.0.0.1:3000/verifyPin",
+             type: 'GET',
+             contentType: 'text/plain',
+             crossDomain: true,
+             dataType: 'text',
+            // processData: false,
+             data:  {"pin":"000000","msgid":messageId},
+             success: function(result){
+                $("#passed").html(result);
+
+            },
+            error: function(err){
+            
+                $("#failed").html("Failed..." + err);
+            },
+ 
+         }); 
+    }
+   
+</script>
+
+</head>
+<body>
+    
+    <hr>    
+        Passed - 
+        <H1><div id="passed"></div></H1>
+        Failed - 
+        <H1><div id="failed"></div></H1> 
+    <hr>
+    <br><br>
+    
+    <form action="demo_form.asp">
+        First name: <input type="text" name="FirstName" ><br>
+            <br></br>
+            Last name: <input type="text" name="LastName" ><br>
+                <br></br>
+                 Telephone Number: <input type="number " ><br>
+                     <br></br>
+                     Confirmation Code: <input type="number " ><br>
+                         <br></br>
+                         <button type="button"
+                             onclick="document.getElementById('demo').innerHTML = Date()">
+                             Submit.</button>
+                         
+                         <p id="demo"></p>
+    </form>
+    
+    <p>Enter the information and Validate your phonenumber here .</p>
+    
+</body>
+</html>
