@@ -47,15 +47,15 @@ app.get('/verifyPhone', function(req, res) {
 
 	// Create a new verification
 	getprove.verify.create({ tel: phone }, function(err, verify) {
-    
-    	if (err) return res.send(400, err.response)	   
+
+    	if (err) return res.send(err.statusCode, err.response);
+    	//if (err) return res.send(400, err.response)	   
 
     	console.log('Create a new verification', verify);
 
     	messageId = verify.id;
 
     	res.writeHead(200, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin' : '*'}); 
-//	    	res.write(messageId);
     	res.end(messageId);
 
     });
@@ -79,12 +79,23 @@ app.get('/verifyPin', function(req, res) {
 
 	getprove.verify.pin(messageId, pin, function(err, verify) {
    
-	   	if (err) return res.send(400, err.response)	   
+	   	if (err) {
+	   		res.setHeader('Access-Control-Allow-Origin', '*' );	
+	   		return res.status(500).send(err.response);
+	   	}
+
+	   	/*{
+	
+			res.writeHead(err.statusCode, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin' : '*' }); 
+	    	res.end(err.response);
+
+	   	}
+	   	*/
+
 	   
 	   	console.log('Verify a pin', verify);
 	    res.writeHead(200, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin' : '*' }); 
-	//		    res.write("Pin confirmed");
-	    res.end("Pin confirmed");
+	    res.end("Pin confirmed!!!");
 
 	});
 

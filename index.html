@@ -1,32 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>PinCheck - Phone Verification System</title>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script>
     
     $( document ).ready(function() {
 
-        $.ajax({
-             url: "http://127.0.0.1:3000/verifyPhone",
-             type: 'GET',
-             contentType: 'text/plain',
-             crossDomain: true,
-             dataType: 'text',
-            // processData: false,
-             data:  {"tele":"15104587920"},
-             success: function(result){
-                $("#passed").html("Message id ==>" +result);
-
-                verifyPin(result);
-
-            },
-            error: function(err){
-            
-                $("#failed").html("Failed..." +err);
-            },
- 
-         }); 
-
+        $("#pin").hide();
+        $("#msg").html("");
+        $("#msg").hide();
 
         /* Twilio SMS Message REST API call  */
         /*
@@ -86,58 +69,166 @@
 
     });
 
+    var messageId = null;
 
-    function verifyPin(messageId){
-         $.ajax({
-             url: "http://127.0.0.1:3000/verifyPin",
+    function verifyPhone(tele){
+       // alert(tele);
+
+        $.ajax({
+             url: "http://127.0.0.1:3000/verifyPhone",
              type: 'GET',
              contentType: 'text/plain',
              crossDomain: true,
              dataType: 'text',
             // processData: false,
-             data:  {"pin":"000000","msgid":messageId},
+             data:  {"tele":tele},
              success: function(result){
-                $("#passed").html(result);
+                
+                messageId = result;
+
+                $("#msg").css("color", "#0000A0");
+                $("#msg").html("Please enter the pin send to your phone");
+                $("#msg").show();  
+
+                $("#pin").show();
+
+
+                // verifyPin(result);
 
             },
             error: function(err){
             
-                $("#failed").html("Failed..." + err);
+                $("#msg").css("color", "red");
+                $("#msg").html(err);
+                $("#msg").show();  
+            },
+ 
+         }); 
+
+    }
+    
+    function verifyPin(ele){
+
+        var pin = $("#pin").val();
+        
+ //       alert("pin ==>"+pin);    
+
+         $.ajax({
+             url: "http://127.0.0.1:3000/verifyPin",
+             type: 'GET',
+             contentType: 'text/plain',
+        //     crossDomain: true,
+             dataType: 'text',
+            // processData: false,
+             data:  {"pin":pin,"msgid":messageId},
+             success: function(result){
+                $("#msg").css("color", "#0000A0");
+                $("#msg").html(result);
+                $("#msg").show();  
+
+            },
+            error: function(err){
+            
+                $("#msg").css("color", "red");
+                $("#msg").html(err);
+                $("#msg").show();  
             },
  
          }); 
     }
    
+
+    function validatePhone(ele){
+        
+        var phoneNumber = $("#tele").val();
+
+        var phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+
+        if (phoneRegex.test(phoneNumber)) {
+
+            $("#msg").css("color", "#0000A0");
+            $("#msg").html("Validating phone  number ...");
+            $("#msg").show();
+
+                
+            var simplePhoneNumber = phoneNumber.replace(/[^\d]/g, "");
+
+//            alert("formattedPhoneNumber ==>"+simplePhoneNumber);       
+
+            verifyPhone(simplePhoneNumber);   
+
+            return;
+
+        } else {
+            //alert("Invalid phone number");
+
+            $("#tele").val("");
+            $("#msg").css("color", "red");
+            $("#msg").html("Incorrect phone number / format");
+            $("#msg").show();
+
+            return;
+        }
+
+
+
+    }
+
+
 </script>
+
+<style type="text/css">
+
+    .tableFormatter
+    {
+        width:100%;
+        vertical-align:top;
+        text-align:center;
+        }
+
+    table {
+     border-collapse: separate; 
+     border-spacing: 5px; 
+    }  
+
+    input {
+        text-align:center;
+        font-size:30px
+    }    
+
+    #msg {
+        text-align:center;
+        font-size:20px;
+        margin-left: 200px;
+        margin-bottom: 40px;
+        font-style: italic;
+    }
+
+</style>
 
 </head>
 <body>
     
-    <hr>    
-        Passed - 
-        <H1><div id="passed"></div></H1>
-        Failed - 
-        <H1><div id="failed"></div></H1> 
-    <hr>
-    <br><br>
-    
-    <form action="demo_form.asp">
-        First name: <input type="text" name="FirstName" ><br>
-            <br></br>
-            Last name: <input type="text" name="LastName" ><br>
-                <br></br>
-                 Telephone Number: <input type="number " ><br>
-                     <br></br>
-                     Confirmation Code: <input type="number " ><br>
-                         <br></br>
-                         <button type="button"
-                             onclick="document.getElementById('demo').innerHTML = Date()">
-                             Submit.</button>
-                         
-                         <p id="demo"></p>
-    </form>
-    
-    <p>Enter the information and Validate your phonenumber here .</p>
-    
+    <center style="margin-top: 250px">
+            <table>
+                <tr>
+                    <td colspan="2" style="color:#0000A0" align="center"><h1>PinCheck</h1> <img src="./pincheck_logo_v1.png"> </td> 
+                </tr>
+
+                <tr>
+                    <td><input tye="text" id="tele" name="tele" size=40 align="center" maxlength=15 placeholder="(XXX) XXX - XXXX" height="50px" onblur="javascript:validatePhone(this);"></td>  
+                    <td><input type="text" id="pin" name="pin" size=10 align="center" maxlength=6 placeholder="pin" onblur="javascript:verifyPin(this);"></td>
+                </tr> 
+
+                <tr>
+                    <td><span id="msg"></span></td> 
+                </tr>
+            </table>
+
+
+    </center>
+
+
+
 </body>
 </html>
